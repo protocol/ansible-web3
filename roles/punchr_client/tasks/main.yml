@@ -1,0 +1,47 @@
+---
+- name: Downloading punchr for {{ ansible_system | lower }}-{{ arch_table[ansible_architecture] }} to {{ punchr_base }}/bin
+  ansible.builtin.get_url:
+    url: "{{ punchr_uri }}"
+    dest: "{{ punchr_base }}/bin/{{ punchr_bin }}"
+    mode: 0755
+  when: punchr_enabled
+# TODO: make this work for non-systemd platforms
+- name: systemd Service definition for punchr
+  ansible.builtin.template:
+    src: punchr.service.j2
+    dest: /etc/systemd/system/punchr.service
+    owner: root
+    group: root
+    mode: 0644
+  register: systemd_service
+  when: punchr_enabled and ansible_service_mgr == "systemd"
+- name: systemd Service removal
+  ansible.builtin.file:
+    path: "/etc/systemd/system/punchr.service"
+    state: absent
+  when: ! punchr_enabled and ansible_service_mgr == "systemd"
+- name: State directory for punchr
+  ansible.builtin.file:
+    path: "{{ punchr_home }}"
+    owner: "{{ punchr_user }}"
+    state: directory
+    mode: 0755
+  when: punchr_enabled
+- name: Reloading systemd daemon
+  ansible.builtin.systemd:
+    daemon_reload: true
+  when: systemd_service.changed and ansible_service_mgr == "systemd"
+- name: Start and enable punchr service
+  ansible.builtin.service:
+    name: punchr
+    state: restarted
+    enabled: true
+  when: punchr_enabled
+# Cover cases where we need to disable punchr
+- name: Stop and disable punchr service
+  ansible.builtin.service:
+    name: punchr
+    state: stopped
+    enabled: false
+  when: ! punchr_enabled
+  failed_when: false

@@ -1,0 +1,15 @@
+# Service definiteion for Punchr libp2p feature test client
+[Unit]
+Description=Punchr Client
+After=network.target
+
+[Service]
+User={{ punchr_user }}
+Environment=PUNCHR_CLIENT_API_KEY={{ punchr_home }}/api-key.txt
+Environment=PUNCHR_CLIENT_KEY_FILE={{ punchr_home }}/client.keys
+WorkingDirectory={{ punchr_home }}
+Restart=always
+ExecStart={{ punchr_base }}/bin/{{ punchr_bin }} {% if punchr_api_key is defined %}--api-key {{ punchr_api_key }}{% endif %}
+
+[Install]
+WantedBy=multiuser.target

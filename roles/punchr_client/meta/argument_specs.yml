@@ -1,0 +1,45 @@
+---
+argument_specs:
+  main:
+    short_description: The main entry point for the punchr_client role.
+    options:
+      punchr_enabled:
+        type: "bool"
+        required: false
+        default: false
+        description: Whether to deploy and enable the punchr service or remove it.
+      punchr_ver:
+        type: "str"
+        required: false
+        default: "v0.9.0"
+        description: Version of punchr client to deploy/enable.
+      punchr_user:
+        type: "str"
+        required: false
+        default: "nobody"
+        description: USer to run the Punchr client as.
+      punchr_base:
+        type: "str"
+        required: false
+        default: "/usr/local"
+        description: Directory tree to install Punchr client under.
+      punchr_home:
+        type: "str"
+        required: false
+        default: "/var/run/punchr"
+        description: Writable directory for Punchr client state.
+      punchr_bin:
+        type: "str"
+        required: false
+        default: "`punchr_cli_{{ ansible_system | lower }}_{{ arch_table[ansible_architecture]}}`"
+        description: Format for the filename of the Punchr binary.
+      punchr_uri:
+        type: "str"
+        required: false
+        default: "`https://github.com/dennis-tra/punchr/releases/download/{{ punchr_ver }}/{{ punchr_bin }}`"
+        description: URI to retrieve the Punchr binary from.
+      punchr_key:
+        type: "str"
+        required: false
+        default: ""
+        description: API key provided by the libp2p/punchr team, if applicable.

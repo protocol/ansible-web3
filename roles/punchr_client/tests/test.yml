@@ -1,0 +1,8 @@
+---
+- hosts: localhost
+  connection: local
+  become: true
+  vars:
+    punchr_enabled: true
+  roles:
+    - punchr_client
